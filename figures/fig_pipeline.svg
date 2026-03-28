@@ -1,0 +1,168 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1365 400" width="1365" height="400"
+     font-family="Arial, Helvetica, sans-serif">
+
+<defs>
+  <marker id="ah-g" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+    <polygon points="0 0,9 3.5,0 7" fill="#9CA3AF"/>
+  </marker>
+  <marker id="ah-b" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+    <polygon points="0 0,9 3.5,0 7" fill="#2563EB"/>
+  </marker>
+</defs>
+
+<rect width="1365" height="400" fill="white"/>
+
+<!-- Column headers (y=24) -->
+<text x="122" y="24" text-anchor="middle" font-size="11" fill="#374151" font-weight="bold">LR Input</text>
+<text x="290" y="24" text-anchor="middle" font-size="11" fill="#374151" font-weight="bold">VAE Encoder</text>
+<text x="452" y="24" text-anchor="middle" font-size="11" fill="#374151">Latent z<tspan baseline-shift="sub" font-size="8">T</tspan></text>
+<text x="604" y="24" text-anchor="middle" font-size="11" fill="#374151" font-weight="bold">LDM UNet</text>
+<text x="760" y="24" text-anchor="middle" font-size="11" fill="#374151">Latent z<tspan baseline-shift="sub" font-size="8">0</tspan></text>
+<text x="920" y="24" text-anchor="middle" font-size="11" fill="#374151" font-weight="bold">VAE Decoder</text>
+<text x="1075" y="24" text-anchor="middle" font-size="11" fill="#374151" font-weight="bold">SR Output</text>
+
+<!-- Annotation strips -->
+<rect x="218" y="34" width="148" height="16" rx="3" fill="#FEF3C7" stroke="#F59E0B" stroke-width="0.8"/>
+<text x="292" y="46" text-anchor="middle" font-size="9" fill="#92400E">differs per row ↕</text>
+<rect x="847" y="34" width="148" height="16" rx="3" fill="#FEF3C7" stroke="#F59E0B" stroke-width="0.8"/>
+<text x="921" y="46" text-anchor="middle" font-size="9" fill="#92400E">differs per row ↕</text>
+<rect x="530" y="34" width="148" height="16" rx="3" fill="#EDE9FE" stroke="#7C3AED" stroke-width="0.8"/>
+<text x="604" y="46" text-anchor="middle" font-size="9" fill="#5B21B6">● identical in both rows</text>
+
+<!-- Row backgrounds -->
+<rect x="82" y="62" width="1110" height="138" rx="8" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1.2"/>
+<rect x="82" y="220" width="1110" height="138" rx="8" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1.5"/>
+
+<!-- Row labels -->
+<text x="88" y="120" font-size="11" fill="#9CA3AF" font-style="italic">SD-VAE SR</text>
+<text x="88" y="134" font-size="9.5" fill="#9CA3AF">(baseline)</text>
+<text x="88" y="278" font-size="11" fill="#1D4ED8" font-weight="bold">MedVAE SR</text>
+<text x="88" y="292" font-size="9.5" fill="#3B82F6">(ours)</text>
+<text x="88" y="154" font-size="8" fill="#6B7280">MRNet · BraTS · CXR</text>
+
+<!-- Shared LR Input box (spans both rows) -->
+<rect x="82" y="70" width="82" height="282" rx="6" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.5"/>
+<text x="123" y="205" text-anchor="middle" font-size="14" fill="#6B7280">LR</text>
+<text x="123" y="222" text-anchor="middle" font-size="10" fill="#9CA3AF">256×256</text>
+<text x="123" y="235" text-anchor="middle" font-size="8" fill="#AAAAAA">(after upsampling)</text>
+
+<!-- LR branch arrows -->
+<polyline points="164,131 205,131" stroke="#9CA3AF" stroke-width="1.5" fill="none" marker-end="url(#ah-g)"/>
+<polyline points="164,289 205,289" stroke="#2563EB" stroke-width="1.5" fill="none" marker-end="url(#ah-b)"/>
+
+<!-- SD-VAE Encoder -->
+<rect x="207" y="101" width="168" height="60" rx="6" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.5"/>
+<text x="291" y="125" text-anchor="middle" font-size="12" fill="#6B7280" font-weight="bold">SD-VAE Encoder</text>
+<text x="291" y="143" text-anchor="middle" font-size="9.5" fill="#9CA3AF">generic (natural images)</text>
+<text x="291" y="156" text-anchor="middle" font-size="8.5" fill="#B0B5BC">4 ch · 32×32 latent *</text>
+
+<polyline points="375,131 408,131" stroke="#9CA3AF" stroke-width="1.5" fill="none" marker-end="url(#ah-g)"/>
+
+<!-- SD-VAE noisy latent -->
+<rect x="410" y="107" width="84" height="48" rx="5" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.5" stroke-dasharray="5,3"/>
+<text x="452" y="127" text-anchor="middle" font-size="13" fill="#6B7280">z<tspan baseline-shift="sub" font-size="9">T</tspan></text>
+<text x="452" y="143" text-anchor="middle" font-size="8" fill="#9CA3AF">z<tspan baseline-shift="sub" font-size="7">LR</tspan> + ε</text>
+<text x="452" y="152" text-anchor="middle" font-size="7.5" fill="#B0B5BC">(noisy)</text>
+
+<polyline points="494,131 528,131" stroke="#9CA3AF" stroke-width="1.5" fill="none" marker-end="url(#ah-g)"/>
+
+<!-- z_LR conditioning arc (SD-VAE, below z_T box) -->
+<path d="M 375,146 C 430,178 490,178 528,154" stroke="#9CA3AF" stroke-width="1.1" stroke-dasharray="4,3" fill="none" marker-end="url(#ah-g)"/>
+<text x="452" y="177" text-anchor="middle" font-size="8" fill="#9CA3AF" font-style="italic">z<tspan baseline-shift="sub" font-size="7">LR</tspan> (cond.)</text>
+
+<!-- Shared UNet (spans both rows) -->
+<rect x="530" y="70" width="148" height="282" rx="8" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="604" y="186" text-anchor="middle" font-size="14" fill="#5B21B6" font-weight="bold">LDM</text>
+<text x="604" y="204" text-anchor="middle" font-size="14" fill="#5B21B6" font-weight="bold">UNet</text>
+<text x="604" y="222" text-anchor="middle" font-size="9.5" fill="#7C3AED">denoising  ↻ T steps</text>
+<text x="604" y="237" text-anchor="middle" font-size="8.5" fill="#8B5CF6">x₀-prediction</text>
+<rect x="544" y="250" width="120" height="26" rx="3" fill="#F3F0FF" stroke="#A78BFA" stroke-width="0.8"/>
+<text x="604" y="261" text-anchor="middle" font-size="8" fill="#6D28D9">Input: concat</text>
+<text x="604" y="272" text-anchor="middle" font-size="8" fill="#6D28D9">[z<tspan baseline-shift="sub" font-size="7">T</tspan> ; z<tspan baseline-shift="sub" font-size="7">LR</tspan>] per row</text>
+<rect x="548" y="316" width="112" height="20" rx="4" fill="#EDE9FE"/>
+<text x="604" y="330" text-anchor="middle" font-size="10" fill="#5B21B6" font-weight="bold">SHARED · identical</text>
+
+<!-- UNet → z_0 arrows -->
+<polyline points="678,131 712,131" stroke="#9CA3AF" stroke-width="1.5" fill="none" marker-end="url(#ah-g)"/>
+<polyline points="678,289 712,289" stroke="#2563EB" stroke-width="1.5" fill="none" marker-end="url(#ah-b)"/>
+
+<!-- SD-VAE clean latent -->
+<rect x="714" y="107" width="84" height="48" rx="5" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.5"/>
+<text x="756" y="127" text-anchor="middle" font-size="13" fill="#6B7280">z<tspan baseline-shift="sub" font-size="9">0</tspan></text>
+<text x="756" y="146" text-anchor="middle" font-size="9" fill="#9CA3AF">clean</text>
+
+<polyline points="798,131 834,131" stroke="#9CA3AF" stroke-width="1.5" fill="none" marker-end="url(#ah-g)"/>
+
+<!-- SD-VAE Decoder -->
+<rect x="836" y="101" width="168" height="60" rx="6" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.5"/>
+<text x="920" y="125" text-anchor="middle" font-size="12" fill="#6B7280" font-weight="bold">SD-VAE Decoder</text>
+<text x="920" y="143" text-anchor="middle" font-size="9.5" fill="#9CA3AF">generic (natural images)</text>
+<text x="920" y="156" text-anchor="middle" font-size="8.5" fill="#B0B5BC">4 ch → 3×256×256</text>
+
+<polyline points="1004,131 1038,131" stroke="#9CA3AF" stroke-width="1.5" fill="none" marker-end="url(#ah-g)"/>
+
+<!-- SD-VAE SR Output -->
+<rect x="1040" y="93" width="110" height="76" rx="6" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.5"/>
+<text x="1095" y="121" text-anchor="middle" font-size="13" fill="#6B7280" font-weight="bold">SR</text>
+<text x="1095" y="139" text-anchor="middle" font-size="10" fill="#6B7280">lower fidelity</text>
+<text x="1095" y="154" text-anchor="middle" font-size="9" fill="#9CA3AF">PSNR −3 dB</text>
+<text x="1095" y="164" text-anchor="middle" font-size="9" fill="#9CA3AF">(baseline)</text>
+
+<!-- MedVAE Encoder -->
+<rect x="207" y="259" width="168" height="60" rx="6" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="291" y="283" text-anchor="middle" font-size="12" fill="#1D4ED8" font-weight="bold">MedVAE Encoder</text>
+<text x="291" y="301" text-anchor="middle" font-size="9.5" fill="#3B82F6">medical domain-specific</text>
+<text x="291" y="314" text-anchor="middle" font-size="8.5" fill="#60A5FA">3 ch · 64×64 latent *</text>
+
+<polyline points="375,289 408,289" stroke="#2563EB" stroke-width="1.5" fill="none" marker-end="url(#ah-b)"/>
+
+<!-- MedVAE noisy latent -->
+<rect x="410" y="265" width="84" height="48" rx="5" fill="#DBEAFE" stroke="#2563EB" stroke-width="1.5" stroke-dasharray="5,3"/>
+<text x="452" y="285" text-anchor="middle" font-size="13" fill="#1D4ED8">z<tspan baseline-shift="sub" font-size="9">T</tspan></text>
+<text x="452" y="301" text-anchor="middle" font-size="8" fill="#3B82F6">z<tspan baseline-shift="sub" font-size="7">LR</tspan> + ε</text>
+<text x="452" y="310" text-anchor="middle" font-size="7.5" fill="#60A5FA">(noisy)</text>
+
+<polyline points="494,289 528,289" stroke="#2563EB" stroke-width="1.5" fill="none" marker-end="url(#ah-b)"/>
+
+<!-- z_LR conditioning arc (MedVAE, above z_T box) -->
+<path d="M 375,274 C 430,242 490,242 528,266" stroke="#2563EB" stroke-width="1.1" stroke-dasharray="4,3" fill="none" marker-end="url(#ah-b)"/>
+<text x="452" y="242" text-anchor="middle" font-size="8" fill="#3B82F6" font-style="italic">z<tspan baseline-shift="sub" font-size="7">LR</tspan> (cond.)</text>
+
+<!-- MedVAE clean latent -->
+<rect x="714" y="265" width="84" height="48" rx="5" fill="#DBEAFE" stroke="#2563EB" stroke-width="1.5"/>
+<text x="756" y="285" text-anchor="middle" font-size="13" fill="#1D4ED8">z<tspan baseline-shift="sub" font-size="9">0</tspan></text>
+<text x="756" y="304" text-anchor="middle" font-size="9" fill="#3B82F6">clean</text>
+
+<polyline points="798,289 834,289" stroke="#2563EB" stroke-width="1.5" fill="none" marker-end="url(#ah-b)"/>
+
+<!-- MedVAE Decoder -->
+<rect x="836" y="259" width="168" height="60" rx="6" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="920" y="283" text-anchor="middle" font-size="12" fill="#1D4ED8" font-weight="bold">MedVAE Decoder</text>
+<text x="920" y="301" text-anchor="middle" font-size="9.5" fill="#3B82F6">medical domain-specific</text>
+<text x="920" y="314" text-anchor="middle" font-size="8.5" fill="#60A5FA">3 ch → 3×256×256</text>
+
+<polyline points="1004,289 1038,289" stroke="#2563EB" stroke-width="1.5" fill="none" marker-end="url(#ah-b)"/>
+
+<!-- MedVAE SR Output -->
+<rect x="1040" y="251" width="110" height="76" rx="6" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="1095" y="279" text-anchor="middle" font-size="13" fill="#1D4ED8" font-weight="bold">SR</text>
+<text x="1095" y="297" text-anchor="middle" font-size="10" fill="#1D4ED8" font-weight="bold">higher fidelity</text>
+<text x="1095" y="311" text-anchor="middle" font-size="9.5" fill="#2563EB" font-weight="bold">+2.91–3.29 dB</text>
+<text x="1095" y="322" text-anchor="middle" font-size="9" fill="#2563EB">(ours)</text>
+
+<!-- Improvement bracket -->
+<line x1="1155" y1="131" x2="1180" y2="131" stroke="#374151" stroke-width="1.2"/>
+<line x1="1180" y1="131" x2="1180" y2="289" stroke="#374151" stroke-width="1.2"/>
+<line x1="1155" y1="289" x2="1180" y2="289" stroke="#374151" stroke-width="1.2"/>
+<line x1="1180" y1="210" x2="1198" y2="210" stroke="#374151" stroke-width="1.2"/>
+
+<!-- Delta annotation (fully within 1580px) -->
+<text x="1204" y="196" font-size="16" fill="#1D4ED8" font-weight="bold">+2.91–3.29 dB</text>
+<text x="1204" y="214" font-size="10" fill="#374151">PSNR (MRNet / BraTS / CXR)</text>
+<text x="1204" y="230" font-size="10" fill="#374151">Cohen's d = 1.37–1.86</text>
+<text x="1204" y="246" font-size="10" fill="#374151">p &lt; 10⁻²⁰  (Wilcoxon)</text>
+
+<!-- Footnote for latent asymmetry (compact, single line at bottom) -->
+<text x="207" y="378" font-size="8" fill="#9CA3AF">* SD-VAE: 4 ch · 32×32; MedVAE: 3 ch · 64×64. Spatial dims aligned at UNet input.</text>
+
+</svg>
