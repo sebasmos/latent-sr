@@ -13,14 +13,10 @@
 # Training auto-resumes from last.ckpt on resubmit.
 # Latents already extracted (7992 files), so Step 1 will be skipped.
 
-cd /orcd/home/002/sebasmos/orcd/pool/code/latent-sr
-module load miniforge/24.3.0-0
-conda activate medvae-sr
-export PYTHONNOUSERSITE=1
-export PYTHONPATH="/orcd/home/002/sebasmos/orcd/pool/code/latent-sr:$PYTHONPATH"
+source "$(dirname "$0")/_env.sh"
 
-DATA_BASE="/orcd/pool/006/lceli_shared"
-OUT_BASE="${DATA_BASE}/mri-uganda"
+DATA_BASE="${LATENT_SR_SHARED_ROOT}"
+OUT_BASE="${LATENT_SR_MRI_UGANDA_ROOT}"
 
 EXPERIMENT=cxr_sdvae
 LOG_FILE="slurm/experiments/${EXPERIMENT}_${SLURM_JOB_ID}.log"
@@ -36,7 +32,7 @@ nvidia-smi 2>/dev/null | head -5
 LATENT_DIR="${OUT_BASE}/embeddings/sd_vae_cxr"
 WEIGHT_DIR="${OUT_BASE}/weights/diffusion_sdvae_cxr_x0"
 EVAL_DIR="outputs/experiments/cxr_sdvae"
-DATA_ROOT="${DATA_BASE}/DATASET/mimic-cxr-sr"
+DATA_ROOT="${LATENT_SR_DATA_ROOT}/mimic-cxr-sr"
 
 # Step 1: Extract latents (skip if already exist)
 if [ ! -d "${LATENT_DIR}/train_latent" ] || [ "$(ls ${LATENT_DIR}/train_latent/hr_*.npy 2>/dev/null | wc -l)" -eq 0 ]; then

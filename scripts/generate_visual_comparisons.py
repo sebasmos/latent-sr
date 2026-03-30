@@ -20,28 +20,30 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
+from repro_paths import dataset_hr_dir, dataset_lr_dir, outputs_root, repo_root
+
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = repo_root()
 
 DATASETS = {
     "mrnet": {
-        "hr_dir": Path("/orcd/pool/006/lceli_shared/DATASET/mrnetkneemris/MRNet-v1.0-middle/valid/hr/"),
-        "lr_dir": Path("/orcd/pool/006/lceli_shared/DATASET/mrnetkneemris/MRNet-v1.0-middle/valid/lr/"),
-        "sr_medvae_dir": PROJECT_ROOT / "outputs/experiments/mrnet_medvae_s1/sr_images/",
-        "sr_sdvae_dir": PROJECT_ROOT / "outputs/experiments/mrnet_sdvae/sr_images/",
+        "hr_dir": dataset_hr_dir("mrnet", "valid"),
+        "lr_dir": dataset_lr_dir("mrnet", "valid"),
+        "sr_medvae_dir": outputs_root() / "experiments/mrnet_medvae_s1/sr_images",
+        "sr_sdvae_dir": outputs_root() / "experiments/mrnet_sdvae/sr_images",
     },
     "brats": {
-        "hr_dir": Path("/orcd/pool/006/lceli_shared/DATASET/brats2023-sr/test/hr/"),
-        "lr_dir": Path("/orcd/pool/006/lceli_shared/DATASET/brats2023-sr/test/lr/"),
-        "sr_medvae_dir": PROJECT_ROOT / "outputs/experiments/brats_medvae_s1/sr_images/",
-        "sr_sdvae_dir": PROJECT_ROOT / "outputs/experiments/brats_sdvae/sr_images/",
+        "hr_dir": dataset_hr_dir("brats", "test"),
+        "lr_dir": dataset_lr_dir("brats", "test"),
+        "sr_medvae_dir": outputs_root() / "experiments/brats_medvae_s1/sr_images",
+        "sr_sdvae_dir": outputs_root() / "experiments/brats_sdvae/sr_images",
     },
 }
 
-OUTPUT_DIR = PROJECT_ROOT / "outputs/figures"
+OUTPUT_DIR = outputs_root() / "figures"
 TARGET_SIZE = (256, 256)
 ROI_SIZE = 64         # side length of the ROI crop (in HR-space pixels)
 ROI_MAG = 3           # magnification factor for the inset

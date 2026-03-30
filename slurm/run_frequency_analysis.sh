@@ -12,11 +12,7 @@
 # Multi-resolution frequency analysis (wavelet + radial FFT) for all 3 datasets.
 # CPU-only job. Compares MedVAE SR vs SD-VAE SR vs HR ground truth.
 
-cd /orcd/home/002/sebasmos/orcd/pool/code/latent-sr
-module load miniforge/24.3.0-0
-conda activate medvae-sr
-export PYTHONNOUSERSITE=1
-export PYTHONPATH="/orcd/home/002/sebasmos/orcd/pool/code/latent-sr:$PYTHONPATH"
+source "$(dirname "$0")/_env.sh"
 
 echo "========================================="
 echo "Frequency Analysis — Wavelet + Radial FFT"

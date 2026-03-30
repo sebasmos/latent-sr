@@ -13,14 +13,10 @@
 # Latents NOT yet extracted. Full pipeline: extract → train → eval → downstream.
 # Training should be fast (~15min for 100 epochs with small dataset).
 
-cd /orcd/home/002/sebasmos/orcd/pool/code/latent-sr
-module load miniforge/24.3.0-0
-conda activate medvae-sr
-export PYTHONNOUSERSITE=1
-export PYTHONPATH="/orcd/home/002/sebasmos/orcd/pool/code/latent-sr:$PYTHONPATH"
+source "$(dirname "$0")/_env.sh"
 
-DATA_BASE="/orcd/pool/006/lceli_shared"
-OUT_BASE="${DATA_BASE}/mri-uganda"
+DATA_BASE="${LATENT_SR_SHARED_ROOT}"
+OUT_BASE="${LATENT_SR_MRI_UGANDA_ROOT}"
 
 EXPERIMENT=brats_medvae
 LOG_FILE="slurm/experiments/${EXPERIMENT}_${SLURM_JOB_ID}.log"
@@ -36,7 +32,7 @@ nvidia-smi 2>/dev/null | head -5
 LATENT_DIR="${OUT_BASE}/embeddings/medvae_4_3_2d_brats"
 WEIGHT_DIR="${OUT_BASE}/weights/diffusion_medvae_brats_x0"
 EVAL_DIR="outputs/experiments/brats_medvae"
-DATA_ROOT="${DATA_BASE}/DATASET/brats2023-sr"
+DATA_ROOT="${LATENT_SR_DATA_ROOT}/brats2023-sr"
 
 # Step 1: Extract latents
 if [ ! -d "${LATENT_DIR}/test_latent" ] || [ "$(ls ${LATENT_DIR}/test_latent/hr_*.npy 2>/dev/null | wc -l)" -eq 0 ]; then

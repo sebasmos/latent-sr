@@ -22,8 +22,6 @@ Outputs:
 """
 
 import argparse
-import os
-import pathlib
 from pathlib import Path
 
 import numpy as np
@@ -32,18 +30,19 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+from repro_paths import dataset_hr_dir, outputs_root, repo_root
+
 # ---------------------------------------------------------------------------
 # Path constants
 # ---------------------------------------------------------------------------
 
-ROOT = Path(__file__).resolve().parent.parent
-BASE_SR = ROOT / "outputs/experiments"
-BASE_HR = Path("/orcd/pool/006/lceli_shared/DATASET")
+ROOT = repo_root()
+BASE_SR = outputs_root() / "experiments"
 
 DATASET_CONFIGS = {
     "mrnet": {
         "title": "MRNet",
-        "hr_dir": BASE_HR / "mrnetkneemris/MRNet-v1.0-middle/valid/hr",
+        "hr_dir": dataset_hr_dir("mrnet", "valid"),
         "methods": {
             "MedVAE SR": {
                 "sr_dir": BASE_SR / "mrnet_medvae_s1/sr_images",
@@ -61,7 +60,7 @@ DATASET_CONFIGS = {
     },
     "brats": {
         "title": "BraTS",
-        "hr_dir": BASE_HR / "brats2023-sr/valid/hr",
+        "hr_dir": dataset_hr_dir("brats", "valid"),
         "methods": {
             "MedVAE SR": {
                 "sr_dir": BASE_SR / "brats_medvae_s1_valid/sr_images",
@@ -75,7 +74,7 @@ DATASET_CONFIGS = {
     },
     "cxr": {
         "title": "CXR",
-        "hr_dir": BASE_HR / "mimic-cxr-sr/valid/hr",
+        "hr_dir": dataset_hr_dir("cxr", "valid"),
         "methods": {
             "MedVAE SR": {
                 "sr_dir": BASE_SR / "cxr_medvae_s1/sr_images",
@@ -89,7 +88,7 @@ DATASET_CONFIGS = {
     },
 }
 
-OUT_DIR = ROOT / "outputs/figures"
+OUT_DIR = outputs_root() / "figures"
 
 # ---------------------------------------------------------------------------
 # Helpers

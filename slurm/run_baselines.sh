@@ -11,11 +11,7 @@
 # Usage:
 #   sbatch --export=DATASET=mrnet,HR_DIR=...,LR_DIR=...,OUT_ROOT=outputs/experiments,MODEL=RealESRGAN_x4plus slurm/run_baselines.sh
 
-cd /orcd/home/002/sebasmos/orcd/pool/code/latent-sr
-module load miniforge/24.3.0-0
-conda activate medvae-sr
-export PYTHONNOUSERSITE=1
-export PYTHONPATH="/orcd/home/002/sebasmos/orcd/pool/code/latent-sr:$PYTHONPATH"
+source "$(dirname "$0")/_env.sh"
 
 DATASET="${DATASET:?DATASET is required}"
 HR_DIR="${HR_DIR:?HR_DIR is required}"

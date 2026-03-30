@@ -12,15 +12,11 @@
 # MRNet eval-only: SR eval on valid set (120 samples) + downstream classification
 # Training already done — just runs Steps 3+4 for both backends.
 
-cd /orcd/home/002/sebasmos/orcd/pool/code/latent-sr
-module load miniforge/24.3.0-0
-conda activate medvae-sr
-export PYTHONNOUSERSITE=1
-export PYTHONPATH="/orcd/home/002/sebasmos/orcd/pool/code/latent-sr:$PYTHONPATH"
+source "$(dirname "$0")/_env.sh"
 
-DATA_BASE="/orcd/pool/006/lceli_shared"
-OUT_BASE="${DATA_BASE}/mri-uganda"
-DATA_ROOT="${DATA_BASE}/DATASET/mrnetkneemris/MRNet-v1.0-middle"
+DATA_BASE="${LATENT_SR_SHARED_ROOT}"
+OUT_BASE="${LATENT_SR_MRI_UGANDA_ROOT}"
+DATA_ROOT="${LATENT_SR_DATA_ROOT}/mrnetkneemris/MRNet-v1.0-middle"
 
 LOG_FILE="slurm/experiments/mrnet_eval_${SLURM_JOB_ID}.log"
 mkdir -p slurm/experiments

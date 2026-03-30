@@ -19,7 +19,7 @@ Usage:
 Inputs:
   SR latents : outputs/experiments/{dataset}_decoder_finetune/sr_latents/sr_*.npy
                shape: (3, 64, 64) float32
-  HR latents : /orcd/pool/006/lceli_shared/mri-uganda/embeddings/medvae_{dataset}_s1/
+  HR latents : ${LATENT_SR_EMBEDDINGS_ROOT}/medvae_{dataset}_s1/
                valid_latent/hr_*.npy
                shape: (3, 64, 64) float32
                NOTE: HR files are named hr_0.npy, hr_1.npy, ... (non-zero-padded integers)
@@ -45,6 +45,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
+from repro_paths import embeddings_root, outputs_root, repo_root
+
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
@@ -59,8 +61,7 @@ DATASET = args.dataset
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-ROOT = pathlib.Path(__file__).resolve().parent.parent
-LATENT_BASE = "/orcd/pool/006/lceli_shared/mri-uganda/embeddings"
+ROOT = repo_root()
 
 if args.sr_latent_dir is not None:
     # Use the explicitly provided SR latent directory (may be absolute or relative to cwd)
@@ -76,10 +77,10 @@ else:
     else:
         SR_LATENT_DIR = _fallback_sr
 
-HR_LATENT_DIR = pathlib.Path(f"{LATENT_BASE}/medvae_{DATASET}_s1/valid_latent")
+HR_LATENT_DIR = embeddings_root() / f"medvae_{DATASET}_s1/valid_latent"
 
-OUT_DIR   = ROOT / f"outputs/experiments/multiresolution_embedding_{DATASET}"
-FIG_DIR   = ROOT / "outputs/figures"
+OUT_DIR   = outputs_root() / f"experiments/multiresolution_embedding_{DATASET}"
+FIG_DIR   = outputs_root() / "figures"
 JSON_PATH = OUT_DIR / "results.json"
 FIG_PATH  = FIG_DIR / f"multiresolution_embedding_{DATASET}.png"
 

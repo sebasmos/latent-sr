@@ -34,24 +34,26 @@ from torchmetrics.image import (
 )
 from tqdm import tqdm
 
+from repro_paths import dataset_hr_dir, dataset_lr_dir, outputs_root, repo_root
+
 # ---------------------------------------------------------------------------
 # Config
 # ---------------------------------------------------------------------------
 
 DATASETS = {
     "MRNet": {
-        "hr": "/orcd/pool/006/lceli_shared/DATASET/mrnetkneemris/MRNet-v1.0-middle/valid/hr",
-        "lr": "/orcd/pool/006/lceli_shared/DATASET/mrnetkneemris/MRNet-v1.0-middle/valid/lr",
+        "hr": dataset_hr_dir("mrnet", "valid"),
+        "lr": dataset_lr_dir("mrnet", "valid"),
         "lr_size": 256,  # already 256x256 -> bicubic is identity
     },
     "BraTS": {
-        "hr": "/orcd/pool/006/lceli_shared/DATASET/brats2023-sr/test/hr",
-        "lr": "/orcd/pool/006/lceli_shared/DATASET/brats2023-sr/test/lr",
+        "hr": dataset_hr_dir("brats", "test"),
+        "lr": dataset_lr_dir("brats", "test"),
         "lr_size": 64,
     },
     "CXR": {
-        "hr": "/orcd/pool/006/lceli_shared/DATASET/mimic-cxr-sr/test/hr",
-        "lr": "/orcd/pool/006/lceli_shared/DATASET/mimic-cxr-sr/test/lr",
+        "hr": dataset_hr_dir("cxr", "test"),
+        "lr": dataset_lr_dir("cxr", "test"),
         "lr_size": 64,
     },
 }
@@ -68,6 +70,7 @@ EXPERIMENTS = {
 }
 
 ROOT = Path(__file__).resolve().parents[1]
+ROOT = repo_root()
 TARGET_SIZE = 256
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 

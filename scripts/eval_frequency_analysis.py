@@ -17,7 +17,7 @@ Usage:
 Inputs:
   MedVAE SR : outputs/experiments/{dataset}_medvae_s1/sr_images/*.png
   SD-VAE SR : outputs/experiments/{dataset}_sdvae/sr_images/*.png
-  HR images : /orcd/pool/006/lceli_shared/DATASET/{dataset_path}/valid/hr/*.png
+  HR images : ${LATENT_SR_DATA_ROOT}/{dataset_path}/valid/hr/*.png
 
 Outputs:
   outputs/experiments/frequency_analysis_{dataset}/results.json
@@ -40,6 +40,8 @@ import numpy as np
 import pywt
 from PIL import Image
 
+from repro_paths import dataset_hr_dir, outputs_root, repo_root
+
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
@@ -52,13 +54,12 @@ DATASET = args.dataset
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-ROOT = pathlib.Path(__file__).resolve().parent.parent
-DATA_BASE = "/orcd/pool/006/lceli_shared"
+ROOT = repo_root()
 
 HR_DIRS = {
-    "mrnet": pathlib.Path(f"{DATA_BASE}/DATASET/mrnetkneemris/MRNet-v1.0-middle/valid/hr"),
-    "brats": pathlib.Path(f"{DATA_BASE}/DATASET/brats2023-sr/valid/hr"),
-    "cxr":   pathlib.Path(f"{DATA_BASE}/DATASET/mimic-cxr-sr/valid/hr"),
+    "mrnet": dataset_hr_dir("mrnet", "valid"),
+    "brats": dataset_hr_dir("brats", "valid"),
+    "cxr": dataset_hr_dir("cxr", "valid"),
 }
 
 # BraTS SR images on test split; use _valid dirs for validation-split HR comparison
@@ -67,8 +68,8 @@ MEDVAE_SR_DIR = ROOT / f"outputs/experiments/{DATASET}_medvae_s1{_suffix}/sr_ima
 SDVAE_SR_DIR  = ROOT / f"outputs/experiments/{DATASET}_sdvae{_suffix}/sr_images"
 HR_DIR        = HR_DIRS[DATASET]
 
-OUT_DIR    = ROOT / f"outputs/experiments/frequency_analysis_{DATASET}"
-FIG_DIR    = ROOT / "outputs/figures"
+OUT_DIR    = outputs_root() / f"experiments/frequency_analysis_{DATASET}"
+FIG_DIR    = outputs_root() / "figures"
 JSON_PATH  = OUT_DIR / "results.json"
 FIG_PATH   = FIG_DIR / f"frequency_analysis_{DATASET}.png"
 

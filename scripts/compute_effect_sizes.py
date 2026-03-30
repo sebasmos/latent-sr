@@ -8,15 +8,13 @@ Compares MedVAE vs SD-VAE on MRNet and BraTS datasets.
 """
 
 import json
-import os
-import sys
 import numpy as np
 from pathlib import Path
 
-# ── Configuration ──────────────────────────────────────────────────────
-BASE = Path(__file__).resolve().parents[1]
+from repro_paths import dataset_hr_dir, repo_root
 
-DATA_BASE = "/orcd/pool/006/lceli_shared"
+# ── Configuration ──────────────────────────────────────────────────────
+BASE = repo_root()
 
 COMPARISONS = [
     {
@@ -26,7 +24,7 @@ COMPARISONS = [
         "a_path": BASE / "outputs/step_ablation_s1/T1000/diffusion_eval_results.json",
         "b_path": BASE / "outputs/experiments/mrnet_sdvae/diffusion_eval_results.json",
         "b_sr_dir": BASE / "outputs/experiments/mrnet_sdvae/sr_images",
-        "hr_dir": Path(f"{DATA_BASE}/DATASET/mrnetkneemris/MRNet-v1.0-middle/valid/hr"),
+        "hr_dir": dataset_hr_dir("mrnet", "valid"),
     },
     {
         "name": "BraTS: MedVAE vs SD-VAE",
@@ -37,7 +35,7 @@ COMPARISONS = [
         "a_sr_dir": BASE / "outputs/experiments/brats_medvae_s1_valid/sr_images",
         "b_path": BASE / "outputs/experiments/brats_sdvae_valid/diffusion_eval_results.json",
         "b_sr_dir": BASE / "outputs/experiments/brats_sdvae_valid/sr_images",
-        "hr_dir": Path(f"{DATA_BASE}/DATASET/brats2023-sr/valid/hr"),
+        "hr_dir": dataset_hr_dir("brats", "valid"),
     },
     {
         "name": "CXR: MedVAE vs SD-VAE",
@@ -46,7 +44,7 @@ COMPARISONS = [
         "a_path": BASE / "outputs/experiments/cxr_medvae_s1/diffusion_eval_results.json",
         "b_path": BASE / "outputs/experiments/cxr_sdvae/diffusion_eval_results.json",
         "b_sr_dir": BASE / "outputs/experiments/cxr_sdvae/sr_images",
-        "hr_dir": Path(f"{DATA_BASE}/DATASET/mimic-cxr-sr/valid/hr"),
+        "hr_dir": dataset_hr_dir("cxr", "valid"),
     },
 ]
 

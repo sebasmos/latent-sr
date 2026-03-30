@@ -6,9 +6,9 @@ Compare SR latents vs HR latents across multiple diffusion timesteps
 
 For each dataset x timestep combination:
   - Load SR latents from:
-      /orcd/pool/006/lceli_shared/mri-uganda/weights/decoder_multit_medvae_{dataset}_s1/sr_latents/{t_key}/sr_*.npy
+      ${LATENT_SR_WEIGHTS_ROOT}/decoder_multit_medvae_{dataset}_s1/sr_latents/{t_key}/sr_*.npy
   - Load HR latents from:
-      /orcd/pool/006/lceli_shared/mri-uganda/embeddings/medvae_{dataset}_s1/valid_latent/hr_*.npy
+      ${LATENT_SR_EMBEDDINGS_ROOT}/medvae_{dataset}_s1/valid_latent/hr_*.npy
   - Match by sort-order index (same convention as eval_multiresolution_embedding.py)
   - Compute cosine similarity at full resolution (64x64) and global mean (1x1)
 
@@ -35,18 +35,20 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
+from repro_paths import embeddings_root, outputs_root, repo_root, weights_root
+
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-ROOT = pathlib.Path(__file__).resolve().parent.parent
-WEIGHTS_BASE = pathlib.Path("/orcd/pool/006/lceli_shared/mri-uganda/weights")
-LATENT_BASE  = pathlib.Path("/orcd/pool/006/lceli_shared/mri-uganda/embeddings")
+ROOT = repo_root()
+WEIGHTS_BASE = weights_root()
+LATENT_BASE = embeddings_root()
 
 DATASETS = ["mrnet", "brats", "cxr"]
 TIMESTEPS = [50, 100, 250, 1000]  # T values
 T_KEYS = {50: "t50", 100: "t100", 250: "t250", 1000: "t1000"}
 
-FIG_DIR = ROOT / "outputs/figures"
+FIG_DIR = outputs_root() / "figures"
 FIG_DIR.mkdir(parents=True, exist_ok=True)
 FIG_PATH = FIG_DIR / "multit_embedding.png"
 
@@ -103,7 +105,7 @@ all_results: dict[str, dict[int, dict]] = {ds: {} for ds in DATASETS}
 
 for dataset in DATASETS:
     hr_latent_dir = LATENT_BASE / f"medvae_{dataset}_s1/valid_latent"
-    out_dir = ROOT / f"outputs/experiments/multit_embedding_{dataset}"
+    out_dir = outputs_root() / f"experiments/multit_embedding_{dataset}"
     out_dir.mkdir(parents=True, exist_ok=True)
     json_path = out_dir / "results.json"
 

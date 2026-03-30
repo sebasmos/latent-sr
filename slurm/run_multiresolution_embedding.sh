@@ -13,11 +13,7 @@
 # at spatial pooling scales 64, 32, 16, 8, 4, 2, 1.
 # CPU-only job (latents loaded from disk). 32GB RAM for large latent arrays.
 
-cd /orcd/home/002/sebasmos/orcd/pool/code/latent-sr
-module load miniforge/24.3.0-0
-conda activate medvae-sr
-export PYTHONNOUSERSITE=1
-export PYTHONPATH="/orcd/home/002/sebasmos/orcd/pool/code/latent-sr:$PYTHONPATH"
+source "$(dirname "$0")/_env.sh"
 
 echo "========================================="
 echo "Multi-resolution Latent Embedding Analysis"

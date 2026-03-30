@@ -17,14 +17,10 @@
 #   sbatch --export=DATASET=brats slurm/run_swinir.sh
 #   sbatch --export=DATASET=cxr   slurm/run_swinir.sh
 
-cd /orcd/home/002/sebasmos/orcd/pool/code/latent-sr
-module load miniforge/24.3.0-0
-conda activate medvae-sr
-export PYTHONNOUSERSITE=1
-export PYTHONPATH="/orcd/home/002/sebasmos/orcd/pool/code/latent-sr:$PYTHONPATH"
+source "$(dirname "$0")/_env.sh"
 
 DATASET="${DATASET:?DATASET env var is required (mrnet|brats|cxr)}"
-DATA_BASE="/orcd/pool/006/lceli_shared/DATASET"
+DATA_BASE="${LATENT_SR_DATA_ROOT}"
 OUT_ROOT="outputs/experiments"
 
 case "${DATASET}" in

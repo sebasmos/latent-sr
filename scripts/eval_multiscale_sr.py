@@ -32,20 +32,22 @@ from skimage.metrics import peak_signal_noise_ratio as ski_psnr
 from skimage.metrics import structural_similarity as ski_ssim
 from tqdm import tqdm
 
+from repro_paths import dataset_hr_dir, outputs_root, repo_root
+
 # ---------------------------------------------------------------------------
 # Config
 # ---------------------------------------------------------------------------
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = repo_root()
 
 DATASETS = {
     "BraTS": {
-        "hr": "/orcd/pool/006/lceli_shared/DATASET/brats2023-sr/test/hr",
-        "existing_4x": str(ROOT / "outputs/experiments/brats_bicubic/sr_images"),
+        "hr": dataset_hr_dir("brats", "test"),
+        "existing_4x": str(outputs_root() / "experiments/brats_bicubic/sr_images"),
     },
     "CXR": {
-        "hr": "/orcd/pool/006/lceli_shared/DATASET/mimic-cxr-sr/test/hr",
-        "existing_4x": str(ROOT / "outputs/experiments/cxr_bicubic/sr_images"),
+        "hr": dataset_hr_dir("cxr", "test"),
+        "existing_4x": str(outputs_root() / "experiments/cxr_bicubic/sr_images"),
     },
 }
 
