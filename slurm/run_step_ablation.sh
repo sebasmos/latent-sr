@@ -14,14 +14,10 @@
 # Uses MRNet S1 model (already trained). Runs 5 evals on valid set (120 samples).
 # Each T=1000 eval takes ~5 min, T=50 takes ~15 sec. Total ~15 min.
 
-cd /orcd/home/002/sebasmos/orcd/pool/code/latent-sr
-module load miniforge/24.3.0-0
-conda activate medvae-sr
-export PYTHONNOUSERSITE=1
-export PYTHONPATH="/orcd/home/002/sebasmos/orcd/pool/code/latent-sr:$PYTHONPATH"
+source "$(dirname "$0")/_env.sh"
 
-DATA_BASE="/orcd/pool/006/lceli_shared"
-OUT_BASE="${DATA_BASE}/mri-uganda"
+DATA_BASE="${LATENT_SR_SHARED_ROOT}"
+OUT_BASE="${LATENT_SR_MRI_UGANDA_ROOT}"
 CHECKPOINT="${OUT_BASE}/weights/diffusion_medvae_mrnet_s1_x0/checkpoints/last.ckpt"
 LATENT_DIR="${OUT_BASE}/embeddings/medvae_mrnet_s1/valid_latent"
 

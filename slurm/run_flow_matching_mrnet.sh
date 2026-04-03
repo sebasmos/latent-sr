@@ -15,14 +15,10 @@
 # Target: +0.5–2 dB PSNR, AUC >0.65, 10–50× speedup vs T=1000 DDPM.
 # 16 Euler steps vs 1000 DDPM steps.
 
-cd /orcd/home/002/sebasmos/orcd/pool/code/latent-sr
-module load miniforge/24.3.0-0
-conda activate medvae-sr
-export PYTHONNOUSERSITE=1
-export PYTHONPATH="/orcd/home/002/sebasmos/orcd/pool/code/latent-sr:$PYTHONPATH"
+source "$(dirname "$0")/_env.sh"
 
-DATA_BASE="/orcd/pool/006/lceli_shared"
-OUT_BASE="${DATA_BASE}/mri-uganda"
+DATA_BASE="${LATENT_SR_SHARED_ROOT}"
+OUT_BASE="${LATENT_SR_MRI_UGANDA_ROOT}"
 
 LATENT_DIR="${OUT_BASE}/embeddings/medvae_mrnet_s1"
 WEIGHT_DIR="${OUT_BASE}/weights/flow_matching_medvae_mrnet"

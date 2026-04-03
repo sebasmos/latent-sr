@@ -25,14 +25,15 @@ import matplotlib.gridspec as gridspec
 from matplotlib.lines import Line2D
 from PIL import Image
 
+from repro_paths import dataset_hr_dir, outputs_root, repo_root
+
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-BASE = pathlib.Path(__file__).resolve().parents[1]
-STAT_DIR  = BASE / "outputs/statistical_tests"
-EXP_DIR   = BASE / "outputs/experiments"
-FIG_DIR   = BASE / "outputs/figures"
-HR_BASE   = pathlib.Path("/orcd/pool/006/lceli_shared/DATASET")
+BASE = repo_root()
+STAT_DIR = outputs_root() / "statistical_tests"
+EXP_DIR = outputs_root() / "experiments"
+FIG_DIR = outputs_root() / "figures"
 
 EFFECT_SIZES_JSON = STAT_DIR / "effect_sizes.json"
 
@@ -69,9 +70,9 @@ SR_DIRS = {
 }
 
 HR_DIRS = {
-    "mrnet": HR_BASE / "mrnetkneemris/MRNet-v1.0-middle/valid/hr",
-    "brats": HR_BASE / "brats2023-sr/valid/hr",
-    "cxr":   HR_BASE / "mimic-cxr-sr/valid/hr",
+    "mrnet": dataset_hr_dir("mrnet", "valid"),
+    "brats": dataset_hr_dir("brats", "valid"),
+    "cxr": dataset_hr_dir("cxr", "valid"),
 }
 
 COLORS = {

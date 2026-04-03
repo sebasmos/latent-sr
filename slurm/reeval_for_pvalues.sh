@@ -13,14 +13,10 @@
 # Re-evaluate SD-VAE and BraTS MedVAE S1 with Sahil's updated eval script
 # to capture per-image metrics needed for Wilcoxon p-values.
 
-cd /orcd/home/002/sebasmos/orcd/pool/code/latent-sr
-module load miniforge/24.3.0-0
-conda activate medvae-sr
-export PYTHONNOUSERSITE=1
-export PYTHONPATH="/orcd/home/002/sebasmos/orcd/pool/code/latent-sr:$PYTHONPATH"
+source "$(dirname "$0")/_env.sh"
 
-DATA_BASE="/orcd/pool/006/lceli_shared"
-OUT_BASE="${DATA_BASE}/mri-uganda"
+DATA_BASE="${LATENT_SR_SHARED_ROOT}"
+OUT_BASE="${LATENT_SR_MRI_UGANDA_ROOT}"
 
 LOG_FILE="slurm/experiments/reeval_pvalues_${SLURM_JOB_ID}.log"
 mkdir -p slurm/experiments

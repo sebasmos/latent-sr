@@ -19,11 +19,17 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
-REPO="$(cd "$ROOT/.." && pwd)"
-SCRIPTS="$ROOT/scripts"
-SLURM_DIR="$ROOT/slurm"
-OUTPUTS="$REPO/outputs"
+REPO="$ROOT"
+SCRIPTS="$REPO/scripts"
+SLURM_DIR="$REPO/slurm"
+OUTPUTS="${LATENT_SR_OUTPUTS_ROOT:-$REPO/outputs}"
 FIGURES="$ROOT/figures"
+CONDA_ENV="${LATENT_SR_CONDA_ENV:-medvae-sr}"
+SHARED_ROOT="${LATENT_SR_SHARED_ROOT:-/orcd/pool/006/lceli_shared}"
+DATA_ROOT="${LATENT_SR_DATA_ROOT:-$SHARED_ROOT/DATASET}"
+MRI_UGANDA_ROOT="${LATENT_SR_MRI_UGANDA_ROOT:-$SHARED_ROOT/mri-uganda}"
+EMBED_PATH="${LATENT_SR_EMBEDDINGS_ROOT:-$MRI_UGANDA_ROOT/embeddings}"
+WEIGHTS_ROOT="${LATENT_SR_WEIGHTS_ROOT:-$MRI_UGANDA_ROOT/weights}"
 
 SKIP_TRAIN=0
 SKIP_EVAL=0
@@ -39,25 +45,41 @@ done
 
 log() { echo "[$(date '+%H:%M:%S')] $*"; }
 
+run_sbatch() {
+  local script="$1"
+  if command -v sbatch >/dev/null 2>&1; then
+    sbatch "$script"
+  else
+    log "SKIP: sbatch not found; cannot submit $(basename "$script") in this environment."
+  fi
+}
+
 # ---------------------------------------------------------------------------
 # STAGE 0: Environment check
 # ---------------------------------------------------------------------------
 log "=== STAGE 0: Environment ==="
-if ! conda info --envs | grep -q medvae-sr; then
-  log "ERROR: conda env 'medvae-sr' not found. Run:"
-  log "  conda env create -f $ROOT/environment.yml"
+if ! command -v conda >/dev/null 2>&1; then
+  log "ERROR: conda is not available on PATH."
   exit 1
 fi
-log "Environment OK: medvae-sr"
+if ! conda info --envs | grep -q "$CONDA_ENV"; then
+  log "ERROR: conda env '$CONDA_ENV' not found. Run:"
+  log "  conda env create -f $REPO/environment.yml"
+  exit 1
+fi
+log "Environment OK: $CONDA_ENV"
 
 # ---------------------------------------------------------------------------
 # STAGE 1: Data preparation
 # ---------------------------------------------------------------------------
 log "=== STAGE 1: Data Preparation ==="
 if [ "$SKIP_TRAIN" -eq 0 ] && [ "$FIGURES_ONLY" -eq 0 ]; then
-  log "MRNet: expects standard MRNet split at /orcd/pool/006/lceli_shared/mri-uganda/"
+  log "MRNet: expects the standard MRNet split"
+  log "MRNet root: $DATA_ROOT/mrnetkneemris/MRNet-v1.0-middle"
   log "BraTS: run prep_brats.sh to extract FLAIR slices"
-  log "CXR:   expects MIMIC-CXR-JPG pre-processed at /orcd/pool/006/lceli_shared/"
+  log "BraTS root: $DATA_ROOT/brats2023-sr"
+  log "CXR:   expects MIMIC-CXR-JPG pre-processed data"
+  log "CXR root: $DATA_ROOT/mimic-cxr-sr"
   log ""
   log "  sbatch $SLURM_DIR/prep_brats.sh"
   log "  (MRNet and CXR data prep is preprocessing-free — see README §2)"
@@ -67,7 +89,6 @@ fi
 # STAGE 2: Extract MedVAE embeddings (cache latents for fast training)
 # ---------------------------------------------------------------------------
 log "=== STAGE 2: Extract Embeddings (cached at shared path — skip if present) ==="
-EMBED_PATH="/orcd/pool/006/lceli_shared/mri-uganda/embeddings"
 if [ -d "$EMBED_PATH/medvae_4_3_2d_v2" ]; then
   log "  Embeddings already cached at $EMBED_PATH — skipping extraction"
 else
@@ -80,22 +101,22 @@ fi
 log "=== STAGE 3: Training (6–8 h per model on A100) ==="
 if [ "$SKIP_TRAIN" -eq 0 ]; then
   log "Submitting MedVAE SR training jobs..."
-  sbatch "$SLURM_DIR/run_brats_medvae.sh"
-  sbatch "$SLURM_DIR/run_cxr_medvae.sh"
-  sbatch "$SLURM_DIR/run_mrnet_eval.sh"   # MRNet uses pre-trained weights
+  run_sbatch "$SLURM_DIR/run_brats_medvae.sh"
+  run_sbatch "$SLURM_DIR/run_cxr_medvae.sh"
+  run_sbatch "$SLURM_DIR/run_mrnet_eval.sh"   # MRNet uses pre-trained weights
   log ""
   log "Submitting SD-VAE SR training jobs..."
-  sbatch "$SLURM_DIR/run_brats_sdvae.sh"
-  sbatch "$SLURM_DIR/run_cxr_sdvae.sh"
+  run_sbatch "$SLURM_DIR/run_brats_sdvae.sh"
+  run_sbatch "$SLURM_DIR/run_cxr_sdvae.sh"
   log ""
   log "Wait for all jobs to complete (use: squeue -u \$USER), then continue."
   log "Pre-trained checkpoint paths:"
-  log "  MedVAE MRNet: /orcd/pool/006/lceli_shared/mri-uganda/weights/diffusion_medvae_mrnet_x0/checkpoints/last.ckpt"
-  log "  MedVAE BraTS: /orcd/pool/006/lceli_shared/mri-uganda/weights/diffusion_medvae_brats_s1/checkpoints/last.ckpt"
-  log "  MedVAE CXR:   /orcd/pool/006/lceli_shared/mri-uganda/weights/diffusion_medvae_cxr_s1/checkpoints/last.ckpt"
-  log "  SD-VAE MRNet: /orcd/pool/006/lceli_shared/mri-uganda/weights/diffusion_sdvae_mrnet_x0/checkpoints/last.ckpt"
-  log "  SD-VAE BraTS: /orcd/pool/006/lceli_shared/mri-uganda/weights/diffusion_sdvae_brats_s1/checkpoints/last.ckpt"
-  log "  SD-VAE CXR:   /orcd/pool/006/lceli_shared/mri-uganda/weights/diffusion_sdvae_cxr_s1/checkpoints/last.ckpt"
+  log "  MedVAE MRNet: $WEIGHTS_ROOT/diffusion_medvae_mrnet_x0/checkpoints/last.ckpt"
+  log "  MedVAE BraTS: $WEIGHTS_ROOT/diffusion_medvae_brats_s1/checkpoints/last.ckpt"
+  log "  MedVAE CXR:   $WEIGHTS_ROOT/diffusion_medvae_cxr_s1/checkpoints/last.ckpt"
+  log "  SD-VAE MRNet: $WEIGHTS_ROOT/diffusion_sdvae_mrnet_x0/checkpoints/last.ckpt"
+  log "  SD-VAE BraTS: $WEIGHTS_ROOT/diffusion_sdvae_brats_s1/checkpoints/last.ckpt"
+  log "  SD-VAE CXR:   $WEIGHTS_ROOT/diffusion_sdvae_cxr_s1/checkpoints/last.ckpt"
 fi
 
 # ---------------------------------------------------------------------------
@@ -103,8 +124,8 @@ fi
 # ---------------------------------------------------------------------------
 log "=== STAGE 4: Evaluate Baselines ==="
 if [ "$SKIP_EVAL" -eq 0 ]; then
-  sbatch "$SLURM_DIR/run_baselines.sh"
-  sbatch "$SLURM_DIR/run_swinir.sh"
+  run_sbatch "$SLURM_DIR/run_baselines.sh"
+  run_sbatch "$SLURM_DIR/run_swinir.sh"
 fi
 
 # ---------------------------------------------------------------------------
@@ -115,7 +136,7 @@ if [ "$SKIP_EVAL" -eq 0 ]; then
   # (Run after checkpoints from Stage 3 are available)
   log "Run eval_diffusion_sr.py for each checkpoint + dataset combo."
   log "See README §5 or individual slurm scripts for exact commands."
-  sbatch "$SLURM_DIR/reeval_for_pvalues.sh"
+  run_sbatch "$SLURM_DIR/reeval_for_pvalues.sh"
 fi
 
 # ---------------------------------------------------------------------------
@@ -123,10 +144,10 @@ fi
 # ---------------------------------------------------------------------------
 log "=== STAGE 6: Paper 1 Analyses ==="
 if [ "$SKIP_EVAL" -eq 0 ]; then
-  sbatch "$SLURM_DIR/run_frequency_analysis.sh"
-  sbatch "$SLURM_DIR/run_hallucination.sh"
-  sbatch "$SLURM_DIR/run_multiresolution_embedding.sh"
-  sbatch "$SLURM_DIR/run_sr_hr_diffmaps.sh"
+  run_sbatch "$SLURM_DIR/run_frequency_analysis.sh"
+  run_sbatch "$SLURM_DIR/run_hallucination.sh"
+  run_sbatch "$SLURM_DIR/run_multiresolution_embedding.sh"
+  run_sbatch "$SLURM_DIR/run_sr_hr_diffmaps.sh"
 fi
 
 # ---------------------------------------------------------------------------
@@ -134,22 +155,22 @@ fi
 # ---------------------------------------------------------------------------
 log "=== STAGE 7: Ablation Studies ==="
 if [ "$SKIP_EVAL" -eq 0 ]; then
-  sbatch "$SLURM_DIR/run_step_ablation.sh"
-  sbatch "$SLURM_DIR/run_flow_matching_mrnet.sh"
-  sbatch "$SLURM_DIR/run_flow_matching_brats.sh"
-  sbatch "$SLURM_DIR/run_flow_matching_cxr.sh"
-  sbatch "$SLURM_DIR/run_t16_mrnet.sh"
-  sbatch "$SLURM_DIR/run_t16_brats.sh"
-  sbatch "$SLURM_DIR/run_t16_cxr.sh"
+  run_sbatch "$SLURM_DIR/run_step_ablation.sh"
+  run_sbatch "$SLURM_DIR/run_flow_matching_mrnet.sh"
+  run_sbatch "$SLURM_DIR/run_flow_matching_brats.sh"
+  run_sbatch "$SLURM_DIR/run_flow_matching_cxr.sh"
+  run_sbatch "$SLURM_DIR/run_t16_mrnet.sh"
+  run_sbatch "$SLURM_DIR/run_t16_brats.sh"
+  run_sbatch "$SLURM_DIR/run_t16_cxr.sh"
 fi
 
 # ---------------------------------------------------------------------------
 # STAGE 8: Statistical tests
 # ---------------------------------------------------------------------------
 log "=== STAGE 8: Statistical Analysis (CPU — runs locally) ==="
-conda run -n medvae-sr python "$SCRIPTS/compute_effect_sizes.py"
-conda run -n medvae-sr python "$SCRIPTS/compute_pvalues.py"
-conda run -n medvae-sr python "$SCRIPTS/compute_bland_altman.py"
+conda run -n "$CONDA_ENV" python "$SCRIPTS/compute_effect_sizes.py"
+conda run -n "$CONDA_ENV" python "$SCRIPTS/compute_pvalues.py"
+conda run -n "$CONDA_ENV" python "$SCRIPTS/compute_bland_altman.py"
 log "Statistical outputs → $OUTPUTS/statistical_tests/"
 
 # ---------------------------------------------------------------------------
@@ -157,14 +178,14 @@ log "Statistical outputs → $OUTPUTS/statistical_tests/"
 # ---------------------------------------------------------------------------
 log "=== STAGE 9: Generate Figures ==="
 cd "$REPO"
-conda run -n medvae-sr python "$SCRIPTS/generate_paper1_fig1.py"
-conda run -n medvae-sr python "$SCRIPTS/plot_ae_ceiling_correlation.py"
-conda run -n medvae-sr python "$SCRIPTS/generate_freq_figures.py"
-conda run -n medvae-sr python "$SCRIPTS/generate_visual_comparisons.py"
-conda run -n medvae-sr python "$SCRIPTS/generate_paper1_composite_figs.py"
-conda run -n medvae-sr python "$SCRIPTS/generate_paper1_fig6.py"
-conda run -n medvae-sr python "$SCRIPTS/plot_perception_distortion.py"
-conda run -n medvae-sr bash   "$SCRIPTS/collect_paper1_figures.sh"
+conda run -n "$CONDA_ENV" python "$SCRIPTS/generate_paper1_fig1.py"
+conda run -n "$CONDA_ENV" python "$SCRIPTS/plot_ae_ceiling_correlation.py"
+conda run -n "$CONDA_ENV" python "$SCRIPTS/generate_freq_figures.py"
+conda run -n "$CONDA_ENV" python "$SCRIPTS/generate_visual_comparisons.py"
+conda run -n "$CONDA_ENV" python "$SCRIPTS/generate_paper1_composite_figs.py"
+conda run -n "$CONDA_ENV" python "$SCRIPTS/generate_paper1_fig6.py"
+conda run -n "$CONDA_ENV" python "$SCRIPTS/plot_perception_distortion.py"
+conda run -n "$CONDA_ENV" bash   "$SCRIPTS/collect_paper1_figures.sh"
 log "Figures → $REPO/figures-paper-1/"
 
 # ---------------------------------------------------------------------------

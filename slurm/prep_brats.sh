@@ -9,11 +9,7 @@
 #SBATCH --error=/dev/null
 
 ### Environment Setup
-cd /orcd/home/002/sebasmos/orcd/pool/code/latent-sr
-module load miniforge/24.3.0-0
-conda activate medvae-sr
-export PYTHONNOUSERSITE=1
-export PYTHONPATH="/orcd/home/002/sebasmos/orcd/pool/code/latent-sr:$PYTHONPATH"
+source "$(dirname "$0")/_env.sh"
 
 LOG_FILE="slurm/prep_brats_${SLURM_JOB_ID}.log"
 mkdir -p slurm
@@ -24,11 +20,11 @@ echo "BraTS 2023 Data Preparation"
 echo "Job: $SLURM_JOB_ID | Node: $(hostname) | Date: $(date)"
 echo "========================================="
 
-DATA_BASE="/orcd/pool/006/lceli_shared"
+DATA_BASE="${LATENT_SR_SHARED_ROOT}"
 
 python -u scripts/prepare_brats_sr.py \
-    --data-root "${DATA_BASE}/DATASET/brats2023/ASNR-MICCAI-BraTS2023-GLI-Challenge-TrainingData" \
-    --output-dir "${DATA_BASE}/DATASET/brats2023-sr" \
+    --data-root "${LATENT_SR_DATA_ROOT}/brats2023/ASNR-MICCAI-BraTS2023-GLI-Challenge-TrainingData" \
+    --output-dir "${LATENT_SR_DATA_ROOT}/brats2023-sr" \
     --mri-sequence t2w \
     --slice-range 0.25 0.75 \
     --slices-per-volume 20 \

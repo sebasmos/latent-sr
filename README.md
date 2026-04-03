@@ -111,10 +111,12 @@ latent-sr/
 
 ## Quick start (pre-trained weights — reproduce figures only)
 
-If you have access to the pre-trained checkpoints at `/orcd/pool/006/lceli_shared/`:
+If you have access to the shared checkpoints and cached latents, point the repo at
+that storage root first:
 
 ```bash
-cd /orcd/pool/005/sebasmos/code/latent-sr
+cd /path/to/latent-sr
+export LATENT_SR_SHARED_ROOT=/orcd/pool/006/lceli_shared
 conda activate medvae-sr
 
 # Run all CPU-only analysis + figure generation
@@ -133,7 +135,25 @@ bash reproduce_all.sh --figures-only
 ```bash
 conda env create -f environment.yml
 conda activate medvae-sr
-export PYTHONPATH="/orcd/pool/005/sebasmos/code/latent-sr:$PYTHONPATH"
+export PYTHONPATH="$PWD:$PYTHONPATH"
+```
+
+### §1.1 — Path configuration
+
+All core scripts now resolve dataset, embedding, weight, and output roots from
+environment variables so the repo can run outside the original ORCD checkout.
+
+```bash
+# Required only if your data is not in the original ORCD layout.
+export LATENT_SR_SHARED_ROOT=/path/to/shared-root
+
+# Optional explicit overrides.
+export LATENT_SR_DATA_ROOT="$LATENT_SR_SHARED_ROOT/DATASET"
+export LATENT_SR_MRI_UGANDA_ROOT="$LATENT_SR_SHARED_ROOT/mri-uganda"
+export LATENT_SR_EMBEDDINGS_ROOT="$LATENT_SR_MRI_UGANDA_ROOT/embeddings"
+export LATENT_SR_WEIGHTS_ROOT="$LATENT_SR_MRI_UGANDA_ROOT/weights"
+export LATENT_SR_OUTPUTS_ROOT="$PWD/outputs"
+export LATENT_SR_CONDA_ENV=medvae-sr
 ```
 
 ### §2 — Dataset access
@@ -192,16 +212,16 @@ sbatch slurm/run_cxr_sdvae.sh
 ```bash
 # MedVAE SR — all 3 datasets
 python scripts/eval_diffusion_sr.py \
-  --checkpoint /orcd/pool/006/lceli_shared/mri-uganda/weights/diffusion_medvae_mrnet_x0/checkpoints/last.ckpt \
-  --latent-dir /orcd/pool/006/lceli_shared/mri-uganda/embeddings/medvae_4_3_2d_v2/phase2/valid_latent \
+  --checkpoint "${LATENT_SR_WEIGHTS_ROOT}/diffusion_medvae_mrnet_x0/checkpoints/last.ckpt" \
+  --latent-dir "${LATENT_SR_EMBEDDINGS_ROOT}/medvae_4_3_2d_v2/phase2/valid_latent" \
   --backend medvae --medvae-model medvae_4_3_2d --modality mri \
   --timesteps 100 --batch-size 4 \
   --output-dir outputs/experiments/mrnet_medvae_s1
 
 # SD-VAE SR — BraTS example
 python scripts/eval_diffusion_sr.py \
-  --checkpoint /orcd/pool/006/lceli_shared/mri-uganda/weights/diffusion_sdvae_brats_s1/checkpoints/last.ckpt \
-  --latent-dir /orcd/pool/006/lceli_shared/mri-uganda/embeddings/sdvae/brats/valid_latent \
+  --checkpoint "${LATENT_SR_WEIGHTS_ROOT}/diffusion_sdvae_brats_s1/checkpoints/last.ckpt" \
+  --latent-dir "${LATENT_SR_EMBEDDINGS_ROOT}/sdvae/brats/valid_latent" \
   --backend sdvae --modality mri \
   --timesteps 100 --batch-size 4 \
   --output-dir outputs/experiments/brats_sdvae_valid
@@ -227,38 +247,31 @@ Results are written to `outputs/experiments/<name>/diffusion_eval_results.json`.
 #### Wavelet frequency analysis (Fig 3, Supp Table 6)
 ```bash
 # CPU-only, ~5 min per dataset
-python scripts/eval_frequency_analysis.py \
-  --sr-dir outputs/experiments/mrnet_medvae_s1/sr_images \
-  --sr-dir-baseline outputs/experiments/mrnet_sdvae/sr_images \
-  --hr-dir /path/to/mrnet/hr_images \
-  --output-dir outputs/experiments/frequency_analysis_mrnet
+python scripts/eval_frequency_analysis.py --dataset mrnet
+python scripts/eval_frequency_analysis.py --dataset brats
+python scripts/eval_frequency_analysis.py --dataset cxr
 ```
 
 #### Hallucination quantification (Fig 4, Supp Figs 2–4, Supp Table 7)
 ```bash
-python scripts/eval_hallucination_quantification.py \
-  --sr-medvae outputs/experiments/mrnet_medvae_s1/sr_images \
-  --sr-sdvae  outputs/experiments/mrnet_sdvae/sr_images \
-  --ae-dir    outputs/experiments/mrnet_medvae_ae/ae_images \
-  --hr-dir    /path/to/mrnet/hr_images \
-  --output-dir outputs/experiments/hallucination_mrnet
+python scripts/eval_hallucination_quantification.py --dataset mrnet
+python scripts/eval_hallucination_quantification.py --dataset brats
+python scripts/eval_hallucination_quantification.py --dataset cxr
 ```
 
 #### Multi-resolution latent embedding (Fig 5, Supp Table 8)
 ```bash
 # CPU-only — uses pre-saved .npy latents
 python scripts/eval_multiresolution_embedding.py \
-  --sr-latent-dir  outputs/experiments/mrnet_decoder_finetune/sr_latents \
-  --hr-latent-dir  /orcd/pool/006/lceli_shared/mri-uganda/embeddings/medvae_4_3_2d_v2/phase2/valid_latent \
-  --output-dir     outputs/experiments/multiresolution_embedding_mrnet
+  --dataset mrnet \
+  --sr-latent-dir outputs/experiments/mrnet_decoder_finetune/sr_latents
 ```
 
 #### SR vs HR difference maps (Supp Figs 5–6)
 ```bash
-python scripts/eval_sr_hr_diffmaps.py \
-  --sr-dir outputs/experiments/mrnet_medvae_s1/sr_images \
-  --hr-dir /path/to/mrnet/hr_images \
-  --output-dir outputs/experiments/sr_hr_diffmaps_mrnet
+python scripts/eval_sr_hr_diffmaps.py --dataset mrnet
+python scripts/eval_sr_hr_diffmaps.py --dataset brats
+python scripts/eval_sr_hr_diffmaps.py --dataset cxr
 ```
 
 ### §7 — Ablation studies (Supp Tables 1–5)
