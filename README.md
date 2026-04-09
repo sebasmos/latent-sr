@@ -1,6 +1,6 @@
-# Paper 1 — Reproducibility Package
+# Domain-Specific Latent Representations Improve Diffusion-Based Medical Image Super-Resolution
 
-**"Domain-Specific Latent Representations Improve Diffusion-Based Medical Image Super-Resolution"**
+**Reproducibility Package**
 
 > **Core finding:** Replacing SD-VAE with MedVAE in an otherwise identical LDM pipeline yields +2.91–3.29 dB PSNR across three medical imaging modalities (Cohen's d = 1.37–1.86; all p < 10⁻²⁰, Wilcoxon signed-rank).
 
@@ -294,8 +294,12 @@ sbatch slurm/run_t16_cxr.sh
 ### §8 — Statistical analysis (Table 2, Supp Tables 5, 9)
 
 ```bash
-# Cohen's d + 95% bootstrap CI (n=10,000)
-python scripts/compute_effect_sizes.py
+# Canonical metrics table — single source of truth for all Table 1 values
+# (PSNR / MS-SSIM / LPIPS for all 21 method×dataset combinations)
+# Note: SD-VAE SR LPIPS for MRNet (0.1731) and CXR (0.1671) were computed
+# during the all_remaining batch eval run and patched into their experiment JSONs.
+python scripts/compute_effect_sizes.py   # also writes metrics_summary.json
+# → outputs/statistical_tests/metrics_summary.json
 # → outputs/statistical_tests/effect_sizes.json
 
 # Wilcoxon signed-rank p-values
@@ -349,7 +353,7 @@ All figures are generated at **300 DPI** in `outputs/figures/` and collected int
 | Dataset | Bicubic | ESRGAN | SwinIR | SD-VAE SR | **MedVAE SR** | MedVAE AE |
 |---------|---------|--------|--------|-----------|---------------|-----------|
 | MRNet PSNR | 23.79 | 23.28 | 22.48 | 22.34 | **25.26** | 27.85 |
-| BraTS PSNR | 29.91 | 27.45 | 28.38 | 23.51 | **26.42** | 38.42 |
+| BraTS PSNR | 29.91 | 27.45 | 28.38 | 23.51 | **26.42** | 37.87 |
 | CXR PSNR | 30.47 | 27.71 | 29.21 | 25.58 | **28.87** | 36.93 |
 | MRNet LPIPS | 0.541 | 0.425 | 0.446 | 0.173 | **0.135** | 0.109 |
 | BraTS LPIPS | 0.218 | 0.098 | 0.077 | 0.097 | **0.088** | 0.014 |
@@ -407,7 +411,8 @@ outputs/
 │   └── mrnet_medvae_t16/ brats_medvae_t16/ cxr_medvae_t16/
 │
 ├── statistical_tests/
-│   ├── effect_sizes.json
+│   ├── metrics_summary.json         ← canonical Table 1 values (all methods × datasets)
+│   ├── effect_sizes.json            ← Cohen's d + 95% bootstrap CI
 │   ├── wilcoxon_results.json
 │   └── bland_altman_stats.json
 │
