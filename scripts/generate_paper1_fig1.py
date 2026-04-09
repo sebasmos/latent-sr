@@ -234,8 +234,9 @@ def make_figure(data, cis):
                 bh     = 0.08
             else:
                 diff   = sd_mean - med_mean      # positive = MedVAE better
-                by     = y_top + y_err + 0.012
-                bh     = 0.003
+                # small proportional offsets (LPIPS range ~0.55, not ~23 like PSNR)
+                by     = y_top + y_err + 0.010 + ds_idx * 0.022
+                bh     = 0.004
 
             color = DS_COLORS[ds]
             ax.plot(
@@ -247,8 +248,8 @@ def make_figure(data, cis):
                 label = f"+{diff:.2f} dB"
                 y_offset = by + bh + 0.15
             else:
-                label = f"\u2212{diff:.4f}" if diff >= 0 else f"+{abs(diff):.4f}"
-                y_offset = by + bh + 0.008
+                label = f"\u2212{diff:.3f}" if diff >= 0 else f"+{abs(diff):.3f}"
+                y_offset = by + bh + 0.006 + ds_idx * 0.012
 
             ax.text(
                 (x_sd + x_med) / 2,
