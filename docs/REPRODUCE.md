@@ -82,7 +82,7 @@ latent-sr/
 
 | Resource | Spec | Used for |
 |----------|------|----------|
-| GPU | NVIDIA L40S | Headline training runs (MedVAE SR, SD-VAE SR, KL-f4 SR — 100 epochs, cached latents, 0.4–3.0 h each) |
+| GPU | NVIDIA L40S | Headline training runs (MedVAE SR, SD-VAE SR, KL-f4 SR, 100 epochs, cached latents, 0.4–3.0 h each) |
 | GPU (alt) | NVIDIA A100 80 GB / H200 130 GB | Ablations, AE-ceiling sweeps, other controls |
 | CPU | 32 GB RAM | Analysis, statistics, figures |
 | Storage | ~200 GB | Checkpoints + latent caches |
@@ -98,15 +98,15 @@ attends over 4× the spatial tokens of 4×32×32 per denoising step).
 Derived artifacts are gated by the credentialing terms of the source datasets; redistribution
 requires holding the corresponding source-data credentials.
 
-- **Diffusion checkpoints:** [`sebasmos/latent-sr-weights`](https://huggingface.co/sebasmos/latent-sr-weights)
-  — 21 trained diffusion UNet checkpoints (7 geometries × 3 datasets). UNet only; the VAE is
+- **Diffusion checkpoints:** [`sebasmos/latent-sr-weights`](https://huggingface.co/sebasmos/latent-sr-weights):
+  21 trained diffusion UNet checkpoints (7 geometries × 3 datasets). UNet only; the VAE is
   loaded separately at inference.
-- **Cached VAE latents:** [`sebasmos/latent-sr-embeddings`](https://huggingface.co/datasets/sebasmos/latent-sr-embeddings)
-  — dataset repo with all 21 `<vae>_<dataset>` latent caches (HR/LR `.npy` per split).
+- **Cached VAE latents:** [`sebasmos/latent-sr-embeddings`](https://huggingface.co/datasets/sebasmos/latent-sr-embeddings):
+  dataset repo with all 21 `<vae>_<dataset>` latent caches (HR/LR `.npy` per split).
 - **Encoders (off-the-shelf):** [`stanfordmimi/MedVAE`](https://huggingface.co/stanfordmimi/MedVAE)
   (all `medvae-*`) and [`stabilityai/sd-vae-ft-ema`](https://huggingface.co/stabilityai/sd-vae-ft-ema) (SD-VAE).
 
-Naming convention — every artifact is `<vae>_<dataset>`:
+Naming convention: every artifact is `<vae>_<dataset>`:
 
 | VAE id | Domain | Latent (C×H×W) | Budget | Role |
 |--------|--------|-----------------|--------|------|
@@ -122,7 +122,7 @@ Naming convention — every artifact is `<vae>_<dataset>`:
 
 ---
 
-## Quick start (pre-trained weights — figures only)
+## Quick start (pre-trained weights, figures only)
 
 ```bash
 cd /path/to/latent-sr
@@ -190,7 +190,7 @@ sbatch slurm/run_brats_medvae.sh
 sbatch slurm/run_cxr_medvae.sh
 sbatch slurm/run_brats_sdvae.sh
 sbatch slurm/run_cxr_sdvae.sh
-# MRNet uses pre-trained weights — no training needed
+# MRNet uses pre-trained weights (no training needed)
 # Hyperparameters (identical across backends): Adam lr=1e-4, batch=8, 100 epochs,
 #   x0-prediction, L1 loss, cosine beta, T=1000
 ```

@@ -5,10 +5,13 @@
 [![arXiv](https://img.shields.io/badge/arXiv-2604.12152-b31b1b.svg)](https://arxiv.org/abs/2604.12152)
 [![HF Weights](https://img.shields.io/badge/🤗%20Weights-latent--sr--weights-yellow.svg)](https://huggingface.co/sebasmos/latent-sr-weights)
 [![HF Embeddings](https://img.shields.io/badge/🤗%20Embeddings-latent--sr--embeddings-yellow.svg)](https://huggingface.co/datasets/sebasmos/latent-sr-embeddings)
+[![GitHub stars](https://img.shields.io/github/stars/sebasmos/latent-sr?style=social)](https://github.com/sebasmos/latent-sr/stargazers)
+
+> If you find this useful, please ⭐ the repo and cite the paper.
 
 Latent diffusion models for medical image super-resolution inherit variational autoencoders
-designed for natural photographs. In a controlled single-variable comparison — holding the UNet,
-objective, schedule, and evaluation protocol fixed and swapping only the VAE — replacing the
+designed for natural photographs. In a controlled single-variable comparison that holds the UNet,
+objective, schedule, and evaluation protocol fixed and swaps only the VAE, replacing the
 Stable Diffusion VAE with the domain-specific MedVAE improves true-HR PSNR by **+1.92 to +3.60 dB**
 across knee MRI, brain MRI, and chest X-ray. Capacity-matched controls and a natural-image VAE at
 MedVAE's identical latent geometry (KL-f4) show the advantage is driven primarily by **latent
