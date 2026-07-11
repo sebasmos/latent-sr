@@ -65,16 +65,21 @@ latent-sr/
 │   │   └── create_lr_images.py
 │   │
 │   ├── Evaluation (pre-revision, self-referential convention)
-│   │   ├── eval_diffusion_sr.py     ← main SR: PSNR / MS-SSIM / LPIPS
-│   │   ├── eval_vae_reconstruction.py   ← AE ceiling (encode+decode only)
+│   │   ├── eval_diffusion_sr.py     ← main SR: PSNR / MS-SSIM / LPIPS (Table 1)
+│   │   ├── eval_vae_reconstruction.py   ← AE ceiling (Supp Table 11)
 │   │   ├── eval_baselines.py        ← bicubic + ESRGAN
 │   │   ├── eval_swinir.py           ← SwinIR baseline
 │   │   ├── eval_multiscale_sr.py    ← multi-scale bicubic (2×/4×/8×)
-│   │   ├── eval_frequency_analysis.py   ← Haar wavelet + FFT power spectrum
-│   │   ├── eval_hallucination_quantification.py  ← pixel-level decomposition
-│   │   ├── eval_multiresolution_embedding.py     ← SR-vs-HR latent cosine sim
+│   │   ├── gen_bicubic_multiscale.py ← 2×/8× bicubic SR image generation (Supp Table 4)
+│   │   ├── eval_frequency_analysis.py   ← Haar wavelet + FFT power spectrum (Supp Table 6)
+│   │   ├── eval_hallucination_quantification.py  ← pixel-level decomposition (Supp Table 7)
+│   │   ├── eval_multiresolution_embedding.py     ← SR-vs-HR latent cosine sim (Supp Table 8)
+│   │   ├── compute_roi_metrics.py   ← BraTS tumour-vs-background ROI PSNR/SSIM (Supp Table 10)
+│   │   ├── compute_fid.py           ← Fréchet Inception Distance (Supp Table 12)
 │   │   ├── eval_sr_hr_diffmaps.py   ← signed difference maps
-│   │   └── eval_multit_embedding.py ← multi-T cosine sim (Supp Table 13)
+│   │   ├── eval_multit_embedding.py ← multi-T cosine sim (Supp Table 13)
+│   │   ├── reencode_sr_latents.py   ← re-encode CXR SR images through MedVAE (R2.11)
+│   │   └── replicate_table4.py      ← MedVAE-paper Table 4 protocol (provenance/sanity check)
 │   │
 │   ├── Evaluation (revision, true-HR convention)
 │   │   ├── eval_diffusion_sr_truehr.py    ← true-HR PSNR/MS-SSIM/LPIPS + AE-ceiling recomputed inline
@@ -84,9 +89,9 @@ latent-sr/
 │   │   └── make_hallucination_figures.sh  ← regenerate + reproducibility-check the hallucination figures
 │   │
 │   ├── Statistical analysis
-│   │   ├── compute_effect_sizes.py  ← Cohen's d + bootstrap CI
+│   │   ├── compute_effect_sizes.py  ← Cohen's d + bootstrap CI (Table 2 / Supp Table 5)
 │   │   ├── compute_pvalues.py       ← Wilcoxon signed-rank
-│   │   └── compute_bland_altman.py  ← Bland-Altman intensity agreement
+│   │   └── compute_bland_altman.py  ← Bland-Altman intensity agreement (Supp Table 9)
 │   │
 │   └── Figure generation
 │       ├── generate_paper1_fig1.py / generate_paper1_fig1_truehr.py  ← Fig 1: PSNR/LPIPS bar chart
@@ -360,6 +365,25 @@ python scripts/eval_multiresolution_embedding.py \
 
 # SR vs HR difference maps
 python scripts/eval_sr_hr_diffmaps.py --dataset mrnet
+```
+
+### §6.1 — Supplementary-table analyses
+
+```bash
+# Supp Table 4 — multi-scale (2×/8×) bicubic baselines (BraTS, CXR)
+python scripts/gen_bicubic_multiscale.py
+
+# Supp Table 10 — BraTS tumour-vs-background ROI PSNR/SSIM (needs seg masks)
+python scripts/compute_roi_metrics.py
+
+# Supp Table 12 — Fréchet Inception Distance across all methods
+sbatch slurm/run_fid.sh          # or: python scripts/compute_fid.py
+
+# R2.11 — re-encode CXR SR images through MedVAE, then re-run the embedding analysis
+sbatch slurm/run_reencode_sr_latents_cxr.sh
+
+# Provenance/sanity check — replicate the original MedVAE paper's Table 4 protocol
+sbatch slurm/run_table4_replication.sh
 ```
 
 ### §7 — Ablation studies (Supp Tables 1–5)
